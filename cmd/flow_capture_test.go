@@ -129,9 +129,9 @@ func TestFlowTableAdvancedDisplay(t *testing.T) {
 	// set display without enrichment
 	rows := getRows([]string{pktDropDisplay, dnsDisplay, rttDisplay, networkEventsDisplay}, []string{noEnrichment})
 	assert.Equal(t, 4, len(rows))
-	assert.Equal(t, `End Time         Src IP       Src Port    Dst IP       Dst Port    Dropped Bytes  Dropped Packets  Drop State         Drop Cause                            Drop Flags  DNS Id  DNS Latency  DNS RCode  DNS Error  Flow RTT  Network Events   `, rows[0])
-	assert.Equal(t, `17:25:28.703000  10.128.0.29  1234        10.129.0.26  5678        32B            1                TCP_INVALID_STATE  SKB_DROP_REASON_TCP_INVALID_SEQUENCE  16          31319   1ms          NoError    0          10µs      hello            `, rows[1])
-	assert.Equal(t, `---------------  ----------   ----------  ----------   ----------  -----          -----            ----------         ----------                            ----------  -----   -----        -----      -----      -----     ---------------  `, rows[2])
+	assert.Equal(t, `End Time         Src IP       Src Port    Dst IP       Dst Port    Dropped Bytes  Dropped Packets  Drop State         Drop Cause                            Drop Flags  DNS Id  DNS Latency  DNS RCode  DNS Error  Flow RTT  Network Events                                                      `, rows[0])
+	assert.Equal(t, `17:25:28.703000  10.128.0.29  1234        10.129.0.26  5678        32B            1                TCP_INVALID_STATE  SKB_DROP_REASON_TCP_INVALID_SEQUENCE  16          31319   1ms          NoError    0          10µs      Allowed by default allow from local node policy, direction Ingress  `, rows[1])
+	assert.Equal(t, `---------------  ----------   ----------  ----------   ----------  -----          -----            ----------         ----------                            ----------  -----   -----        -----      -----      -----     ---------------                                                     `, rows[2])
 	assert.Empty(t, rows[3])
 
 	// set display to standard
@@ -173,8 +173,8 @@ func TestFlowTableAdvancedDisplay(t *testing.T) {
 	// set display to NetworkEvents
 	rows = getRows([]string{networkEventsDisplay}, []string{noEnrichment})
 	assert.Equal(t, 4, len(rows))
-	assert.Equal(t, `End Time         Src IP       Src Port    Dst IP       Dst Port    Network Events   `, rows[0])
-	assert.Equal(t, `17:25:28.703000  10.128.0.29  1234        10.129.0.26  5678        hello            `, rows[1])
-	assert.Equal(t, `---------------  ----------   ----------  ----------   ----------  ---------------  `, rows[2])
+	assert.Equal(t, `End Time         Src IP       Src Port    Dst IP       Dst Port    Network Events                                                      `, rows[0])
+	assert.Equal(t, `17:25:28.703000  10.128.0.29  1234        10.129.0.26  5678        Allowed by default allow from local node policy, direction Ingress  `, rows[1])
+	assert.Equal(t, `---------------  ----------   ----------  ----------   ----------  ---------------                                                     `, rows[2])
 	assert.Empty(t, rows[3])
 }

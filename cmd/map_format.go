@@ -9,6 +9,7 @@ import (
 
 	"github.com/jpillora/sizestr"
 	"github.com/netobserv/flowlogs-pipeline/pkg/config"
+	ovnmodel "github.com/ovn-org/ovn-kubernetes/go-controller/observability-lib/model"
 )
 
 const (
@@ -431,6 +432,47 @@ func toTimeString(genericMap config.GenericMap, fieldName string) string {
 	return emptyText
 }
 
+func networkEventsToString(flow config.GenericMap) string {
+	if ne, found := flow["NetworkEvents"]; found {
+		if neList, isList := ne.([]any); isList {
+			var messages []string
+			for _, item := range neList {
+				if neItem, isMap := item.(map[string]any); isMap {
+					messages = append(messages, networkEventItemToString(neItem))
+				}
+			}
+			return strings.Join(messages, ", ")
+		}
+	}
+	return ""
+}
+
+func networkEventItemToString(in map[string]any) string {
+	if msg := getAsString(in, "Message"); msg != "" {
+		return msg
+	}
+	if feat := getAsString(in, "Feature"); feat == "acl" {
+		aclObj := ovnmodel.ACLEvent{
+			Action:    getAsString(in, "Action"),
+			Actor:     getAsString(in, "Type"),
+			Name:      getAsString(in, "Name"),
+			Namespace: getAsString(in, "Namespace"),
+			Direction: getAsString(in, "Direction"),
+		}
+		return aclObj.String()
+	}
+	return ""
+}
+
+func getAsString(in map[string]any, key string) string {
+	if anyV, hasKey := in[key]; hasKey {
+		if v, isStr := anyV.(string); isStr {
+			return v
+		}
+	}
+	return ""
+}
+
 func toTitles(strs []string) []string {
 	titleCaseStrs := []string{}
 	for _, s := range strs {
@@ -504,6 +546,8 @@ func ToTableRow(genericMap config.GenericMap, colIDs []string) []interface{} {
 			row = append(row, toDuration(genericMap, fieldName, time.Millisecond))
 		case "TimeFlowRttMs":
 			row = append(row, toDuration(genericMap, fieldName, time.Nanosecond))
+		case "NetworkEvents":
+			row = append(row, networkEventsToString(genericMap))
 		default:
 			// else simply pick field value as text from column name
 			row = append(row, toValue(genericMap, fieldName))
