@@ -319,6 +319,18 @@ var _ = g.Describe("NetObserv CLI e2e integration test suite", g.Ordered, func()
 				matcher: o.BeFalse(),
 			},
 			{
+				when:    "Executing `oc netobserv flows --enable_network_events`",
+				it:      "does not run as privileged",
+				cliArgs: []string{"flows", "--enable_network_events", "--background", "--max-time=1m"},
+				matcher: o.BeFalse(),
+			},
+			{
+				when:    "Executing `oc netobserv flows --enable_udn_mapping`",
+				it:      "does not run as privileged",
+				cliArgs: []string{"flows", "--enable_udn_mapping", "--background", "--max-time=1m"},
+				matcher: o.BeFalse(),
+			},
+			{
 				// the agent only starts if the SCC allows the capability it asks for
 				when:      "Executing `oc netobserv flows --enable_secondary_networks`",
 				it:        "does not run as privileged and gets SYS_ADMIN",
